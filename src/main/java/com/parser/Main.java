@@ -29,7 +29,6 @@ public class Main {
             page.navigate("https://dprp.gov.ro/web/rezultate-sesiune-de-finantare-2020/");
             page.waitForTimeout(3000);
 
-            // Gestionare cookie modal
             ElementHandle cookieButton = page.querySelector("#wt-cli-accept-all-btn");
             if (cookieButton != null && cookieButton.isVisible()) {
                 cookieButton.click();
@@ -48,9 +47,8 @@ public class Main {
                     LocalDate extractedDate = LocalDate.parse(dateText, formatter);
                     LocalDate referenceDate = LocalDate.of(2025, 4, 24); // 24.04.2025
 
-                    // Compară data
+
                     if (extractedDate.equals(referenceDate)) {
-                        // Execută logica pentru articleLink
                         Locator articleLink = page.locator("html > body > div:nth-of-type(1) > div > div > div > div > div:nth-of-type(1) > div > div:nth-of-type(5) > ul > li:nth-of-type(1) > div > p:nth-of-type(1)");
                         if (articleLink.isVisible()) {
                             String linkText = articleLink.innerText();
