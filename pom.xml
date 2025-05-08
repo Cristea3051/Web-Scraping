@@ -50,6 +50,13 @@
       <artifactId>JColor</artifactId>
       <version>5.5.1</version>
     </dependency>
+
+    <!-- Telegram Bot -->
+    <dependency>
+      <groupId>org.telegram</groupId>
+      <artifactId>telegrambots</artifactId>
+      <version>6.9.0</version>
+    </dependency>
   </dependencies>
 
   <build>

@@ -1,6 +1,5 @@
 package com.parser;
 
-
-public class Notifier {
+public class Notifier{
 
 }

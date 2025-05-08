@@ -1,6 +1,13 @@
 package com.parser;
 
 import com.microsoft.playwright.*;
+import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.TelegramBotsApi;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
+
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
@@ -12,6 +19,20 @@ import static com.diogonunes.jcolor.Attribute.*;
 
 public class Main {
     public static void main(String[] args) {
+        // Initialize bot
+        ParserSTVBot bot = new ParserSTVBot();
+        long chatId = 1019028913;
+
+        // Register bot
+        try {
+            TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
+            botsApi.registerBot(bot);
+            System.out.println("Bot registered successfully");
+        } catch (TelegramApiException e) {
+            System.err.println("Failed to register bot: " + e.getMessage());
+            return; // Stop execution if bot registration fails
+        }
+
         try (Playwright playwright = Playwright.create()) {
             List<String> arguments = new ArrayList<>();
             arguments.add("--start-maximized");
@@ -32,43 +53,56 @@ public class Main {
             ElementHandle cookieButton = page.querySelector("#wt-cli-accept-all-btn");
             if (cookieButton != null && cookieButton.isVisible()) {
                 cookieButton.click();
-                System.out.println(colorize("✅ Cookie modal was found and clicked.", CYAN_TEXT(), BOLD()));
+                bot.sendMessage(chatId, "✅ Cookie modal was found and clicked.");
             } else {
-                System.out.println(colorize("ℹ️ No cookie modal found. Skipping click.", RED_TEXT(), BOLD()));
+                bot.sendMessage(chatId, "ℹ️ No cookie modal found. Skipping click.");
             }
 
-            Locator postDate = page.locator("" +
-                    "html > body > div:nth-of-type(1) > div > div > div > div > div:nth-of-type(1) > div > div:nth-of-type(5) > ul > li:nth-of-type(1) > div > p:nth-of-type(2)");
-            if (postDate.isVisible()) {
-                String dateText = postDate.innerText().trim();
-                System.out.println(colorize(dateText, CYAN_TEXT(), BOLD()));
-                try {
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-                    LocalDate extractedDate = LocalDate.parse(dateText, formatter);
-                    LocalDate referenceDate = LocalDate.of(2025, 4, 24); // 24.04.2025
+            Locator articleLink = page.locator("//*[@id='alxposts-2']/ul/li[1]/div/p[1]");
+            String linkText = articleLink.innerText();
+            Locator articleDate = page.locator("//*[@id='alxposts-2']/ul/li[1]/div/p[2]");
+            String linkDate = articleDate.innerText();
 
-
-                    if (extractedDate.equals(referenceDate)) {
-                        Locator articleLink = page.locator("html > body > div:nth-of-type(1) > div > div > div > div > div:nth-of-type(1) > div > div:nth-of-type(5) > ul > li:nth-of-type(1) > div > p:nth-of-type(1)");
-                        if (articleLink.isVisible()) {
-                            String linkText = articleLink.innerText();
-                            System.out.println(colorize("✅ Found article: " + linkText, CYAN_TEXT(), BOLD()));
-                        } else {
-                            System.out.println(colorize("❌ Article link not found.", RED_TEXT(), BOLD()));
-                        }
-                    } else {
-                        System.out.println(colorize("ℹ️ Date does not match: " + dateText + " (expected 24.04.2025)", YELLOW_TEXT(), BOLD()));
-                    }
-                } catch (Exception e) {
-                    System.out.println(colorize("❌ Failed to parse date: " + dateText, RED_TEXT(), BOLD()));
-                }
+            LocalDate today = LocalDate.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            String formattedDate = today.format(formatter);
+            if (linkDate.equals(formattedDate)) {
+                bot.sendMessage(chatId, "Today: " + formattedDate);
+                bot.sendMessage(chatId, "✅ Found article: " + linkText + " from date " + linkDate);
             } else {
-                System.out.println(colorize("❌ Post date not found.", RED_TEXT(), BOLD()));
+                bot.sendMessage(chatId, "ℹ️ No content from today");
             }
-
             page.waitForTimeout(3000);
             context.close();
         }
     }
 }
 
+class ParserSTVBot extends TelegramLongPollingBot {
+    @Override
+    public String getBotUsername() {
+        return "ParserSTVBOT";
+    }
+
+    @Override
+    public String getBotToken() {
+        return "7863658607:AAFerJYvK8kq2Z8RVLKlfjBBDTusyqw2-uQ"; // Fallback direct token
+    }
+
+    @Override
+    public void onUpdateReceived(Update update) {
+        // Not used here
+    }
+
+    public void sendMessage(long chatId, String text) {
+        SendMessage message = new SendMessage();
+        message.setChatId(chatId);
+        message.setText(text);
+        try {
+            execute(message);
+            System.out.println("Sent message: " + text);
+        } catch (TelegramApiException e) {
+            System.err.println("Failed to send message: " + e.getMessage());
+        }
+    }
+}
