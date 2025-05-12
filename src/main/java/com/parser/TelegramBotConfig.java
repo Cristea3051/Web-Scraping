@@ -41,6 +41,11 @@ public class TelegramBotConfig extends TelegramLongPollingBot {
             return false;
         }
     }
+    public void sendToAll(String message) {
+        for (long chatId : ChatConfig.CHAT_IDS) {
+            sendMessage(chatId, message);
+        }
+    }
 
     public void sendMessage(long chatId, String text) {
         SendMessage message = new SendMessage();

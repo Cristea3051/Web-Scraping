@@ -57,6 +57,7 @@
       <artifactId>telegrambots</artifactId>
       <version>6.9.0</version>
     </dependency>
+
   </dependencies>
 
   <build>
