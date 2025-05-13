@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 public class Main {
     private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
     private static final String TARGET_URL = "https://dprp.gov.ro/web/rezultate-sesiune-de-finantare-2020/";
+    private static final String TARGET_URL_ONDRL = "https://ondrl.gov.md/comunicare-publica/ ";
 
     public static void main(String[] args) {
         TelegramBotConfig botConfig = new TelegramBotConfig();
@@ -45,6 +46,22 @@ public class Main {
                 ArticleChecker.checkLatestArticleFromAnotherPage(botConfig);
             }
         }
+    }
+
+    public static void scrapeAndNotifiFromOndrl(TelegramBotConfig botConfig){
+
+        try (Playwright playwright = Playwright.create()) {
+            BrowserContext context = setupBrowserContext(playwright);
+            try (context) {
+                Page page = context.pages().get(0);
+                page.navigate(TARGET_URL);
+                page.waitForTimeout(3000);
+
+                CookieHandler.handleCookieModal(botConfig, page);
+                ArticleChecker.checkLatestArticleFromOndrl(botConfig, page);
+            }
+        }
+
     }
 
     private static BrowserContext setupBrowserContext(Playwright playwright) {
