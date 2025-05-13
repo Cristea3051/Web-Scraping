@@ -14,6 +14,7 @@ public class Main {
     private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
     private static final String TARGET_URL = "https://dprp.gov.ro/web/rezultate-sesiune-de-finantare-2020/";
     private static final String TARGET_URL_ONDRL = "https://ondrl.gov.md/comunicare-publica/ ";
+    private static final String URL_EGRANT = "https://egrant.md/category/granturi/";
 
     public static void main(String[] args) {
         TelegramBotConfig botConfig = new TelegramBotConfig();
@@ -24,6 +25,8 @@ public class Main {
 
         try {
             scrapeAndNotify(botConfig);
+            scrapeAndNotifiFromOndrl(botConfig);
+            scrapeAndNotifiFromEgrant(botConfig);
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Unexpected error during scraping", e);
             botConfig.sendToAll("❌ An unexpected error occurred: " + e.getMessage());
@@ -42,8 +45,7 @@ public class Main {
                 page.waitForTimeout(3000);
 
                 CookieHandler.handleCookieModal(botConfig, page);
-                ArticleChecker.checkLatestArticle(botConfig, page);
-                ArticleChecker.checkLatestArticleFromAnotherPage(botConfig);
+                ArticleChecker.checkLatestArticles(botConfig, page);
             }
         }
     }
@@ -54,14 +56,27 @@ public class Main {
             BrowserContext context = setupBrowserContext(playwright);
             try (context) {
                 Page page = context.pages().get(0);
-                page.navigate(TARGET_URL);
+                page.navigate(TARGET_URL_ONDRL);
                 page.waitForTimeout(3000);
 
                 CookieHandler.handleCookieModal(botConfig, page);
-                ArticleChecker.checkLatestArticleFromOndrl(botConfig, page);
+                ArticleChecker.checkLatestArticlesFromOndrl(botConfig, page);
             }
         }
+    }
 
+    public static void scrapeAndNotifiFromEgrant(TelegramBotConfig botConfig){
+
+        try (Playwright playwright = Playwright.create()) {
+            BrowserContext context = setupBrowserContext(playwright);
+            try (context) {
+                Page page = context.pages().get(0);
+                page.navigate(URL_EGRANT);
+                page.waitForTimeout(3000);
+                CookieHandler.handleCookieModal(botConfig, page);
+                ArticleChecker.chechLatestArticlesFromEgrant(botConfig, page);
+            }
+        }
     }
 
     private static BrowserContext setupBrowserContext(Playwright playwright) {
