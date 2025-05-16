@@ -16,8 +16,8 @@ import java.util.List;
  */
 public class ChatConfig {
     public static final List<Long> CHAT_IDS = List.of(
-            1019028913L
-//            5565832402L //Taniusa
+            1019028913L,
+            5565832402L //Taniusa
             // Add additional chat IDs here as needed
     );
 }
