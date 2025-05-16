@@ -25,7 +25,7 @@ public class Main {
         }
 
         try {
-            scrapeAndNotify(botConfig);
+//            scrapeAndNotify(botConfig);
             scrapeAndNotifiFromOndrl(botConfig);
             scrapeAndNotifiFromEgrant(botConfig);
         } catch (Exception e) {
@@ -37,26 +37,26 @@ public class Main {
         }
     }
 
-    private static void scrapeAndNotify(TelegramBotConfig botConfig) {
-        try (Playwright playwright = Playwright.create()) {
-            BrowserContext context = setupBrowserContext(playwright);
-            try (context) {
-                Page page = context.pages().get(0);
-                page.navigate(TARGET_URL);
-                page.waitForTimeout(3000);
-
-                CookieHandler.handleCookieModal(botConfig, page);
-                ArticleChecker.checkLatestArticles(botConfig, page);
-            }
-        }
-    }
+//    private static void scrapeAndNotify(TelegramBotConfig botConfig) {
+//        try (Playwright playwright = Playwright.create()) {
+//            BrowserContext context = setupBrowserContext(playwright);
+//            try (context) {
+//                Page page = context.pages().getFirst();
+//                page.navigate(TARGET_URL);
+//                page.waitForTimeout(3000);
+//
+//                CookieHandler.handleCookieModal(botConfig, page);
+//                ArticleChecker.checkLatestArticles(botConfig, page);
+//            }
+//        }
+//    }
 
     public static void scrapeAndNotifiFromOndrl(TelegramBotConfig botConfig){
 
         try (Playwright playwright = Playwright.create()) {
             BrowserContext context = setupBrowserContext(playwright);
             try (context) {
-                Page page = context.pages().get(0);
+                Page page = context.pages().getFirst();
                 page.navigate(TARGET_URL_ONDRL);
                 page.waitForTimeout(3000);
 
@@ -71,7 +71,7 @@ public class Main {
         try (Playwright playwright = Playwright.create()) {
             BrowserContext context = setupBrowserContext(playwright);
             try (context) {
-                Page page = context.pages().get(0);
+                Page page = context.pages().getFirst();
                 page.navigate(URL_EGRANT);
                 page.waitForTimeout(3000);
                 CookieHandler.handleCookieModal(botConfig, page);
@@ -86,6 +86,7 @@ public class Main {
 
         Path userDataDir = Paths.get("my-user-data-dir");
         BrowserType.LaunchPersistentContextOptions options = new BrowserType.LaunchPersistentContextOptions()
+                .setHeadless(false)
                 .setArgs(arguments)
                 .setViewportSize(null);
 
