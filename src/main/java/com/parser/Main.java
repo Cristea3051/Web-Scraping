@@ -86,7 +86,7 @@ public class Main {
 
         Path userDataDir = Paths.get("my-user-data-dir");
         BrowserType.LaunchPersistentContextOptions options = new BrowserType.LaunchPersistentContextOptions()
-                .setHeadless(true)
+                .setHeadless(false)
                 .setArgs(arguments)
                 .setViewportSize(null);
 

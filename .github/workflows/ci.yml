@@ -16,5 +16,7 @@ jobs:
           java-version: '17'
       - name: Build & Install
         run: mvn -B install -D skipTests --no-transfer-progress
-      - name: Run Application
-        run: sudo mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="install-deps"
+      - name: Compile Application
+        run: mvn clean compile
+      - name: Compile Application
+        run: mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="install-deps"
