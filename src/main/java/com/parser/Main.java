@@ -3,8 +3,6 @@ package com.parser;
 import com.microsoft.playwright.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -15,6 +13,9 @@ public class Main {
     private static final String TARGET_URL = "https://dprp.gov.ro/web/rezultate-sesiune-de-finantare-2020/";
     private static final String TARGET_URL_ONDRL = "https://ondrl.gov.md/comunicare-publica/ ";
     private static final String URL_EGRANT = "https://egrant.md/category/granturi/";
+//    private static final String URL_MIDR = "https://midr.gov.md/ro/noutati";
+
+
 
     public static void main(String[] args) {
         TelegramBotConfig botConfig = new TelegramBotConfig();
@@ -85,7 +86,7 @@ public class Main {
 
         Path userDataDir = Paths.get("my-user-data-dir");
         BrowserType.LaunchPersistentContextOptions options = new BrowserType.LaunchPersistentContextOptions()
-                .setHeadless(false)
+                .setHeadless(true)
                 .setArgs(arguments)
                 .setViewportSize(null);
 
