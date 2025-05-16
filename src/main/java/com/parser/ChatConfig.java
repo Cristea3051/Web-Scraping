@@ -1,5 +1,6 @@
 package com.parser;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -15,9 +16,12 @@ import java.util.List;
  * Replace <YOUR_BOT_TOKEN> with your actual bot token.
  */
 public class ChatConfig {
-    public static final List<Long> CHAT_IDS = List.of(
-            1019028913L,
-            5565832402L //Taniusa
-            // Add additional chat IDs here as needed
-    );
+    public static final List<Long> CHAT_IDS;
+
+    static {
+        // Add additional chat IDs here as needed
+        CHAT_IDS = new ArrayList<>();
+        CHAT_IDS.add(1019028913L);
+        CHAT_IDS.add(5565832402L);
+    }
 }
