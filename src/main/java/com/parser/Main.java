@@ -10,10 +10,9 @@ import java.util.logging.Logger;
 
 public class Main {
     private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
-    private static final String TARGET_URL = "https://dprp.gov.ro/web/rezultate-sesiune-de-finantare-2020/";
     private static final String TARGET_URL_ONDRL = "https://ondrl.gov.md/comunicare-publica/ ";
     private static final String URL_EGRANT = "https://egrant.md/category/granturi/";
-//    private static final String URL_MIDR = "https://midr.gov.md/ro/noutati";
+    private static final String URL_MIDR = "https://midr.gov.md/ro/noutati";
 
 
 
@@ -25,9 +24,9 @@ public class Main {
         }
 
         try {
-//            scrapeAndNotify(botConfig);
             scrapeAndNotifiFromOndrl(botConfig);
             scrapeAndNotifiFromEgrant(botConfig);
+//            scrapeAndNotifiFromMidr(botConfig);
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Unexpected error during scraping", e);
             botConfig.sendToAll("❌ An unexpected error occurred: " + e.getMessage());
@@ -37,20 +36,6 @@ public class Main {
         }
     }
 
-//    private static void scrapeAndNotify(TelegramBotConfig botConfig) {
-//        try (Playwright playwright = Playwright.create()) {
-//            BrowserContext context = setupBrowserContext(playwright);
-//            try (context) {
-//                Page page = context.pages().getFirst();
-//                page.navigate(TARGET_URL);
-//                page.waitForTimeout(3000);
-//
-//                CookieHandler.handleCookieModal(botConfig, page);
-//                ArticleChecker.checkLatestArticles(botConfig, page);
-//            }
-//        }
-//    }
-
     public static void scrapeAndNotifiFromOndrl(TelegramBotConfig botConfig){
 
         try (Playwright playwright = Playwright.create()) {
@@ -59,9 +44,20 @@ public class Main {
                 Page page = context.pages().getFirst();
                 page.navigate(TARGET_URL_ONDRL);
                 page.waitForTimeout(3000);
-
-                CookieHandler.handleCookieModal(botConfig, page);
                 ArticleChecker.checkLatestArticlesFromOndrl(botConfig, page);
+            }
+        }
+    }
+
+    public static void scrapeAndNotifiFromMidr(TelegramBotConfig botConfig){
+
+        try (Playwright playwright = Playwright.create()) {
+            BrowserContext context = setupBrowserContext(playwright);
+            try (context) {
+                Page page = context.pages().getFirst();
+                page.navigate(URL_MIDR);
+                page.waitForTimeout(3000);
+                ArticleChecker.checkLatestArticlesFromMidr(botConfig, page);
             }
         }
     }
@@ -74,7 +70,6 @@ public class Main {
                 Page page = context.pages().getFirst();
                 page.navigate(URL_EGRANT);
                 page.waitForTimeout(3000);
-                CookieHandler.handleCookieModal(botConfig, page);
                 ArticleChecker.chechLatestArticlesFromEgrant(botConfig, page);
             }
         }
@@ -86,7 +81,7 @@ public class Main {
 
         Path userDataDir = Paths.get("my-user-data-dir");
         BrowserType.LaunchPersistentContextOptions options = new BrowserType.LaunchPersistentContextOptions()
-                .setHeadless(true)
+                .setHeadless(false)
                 .setArgs(arguments)
                 .setViewportSize(null);
 

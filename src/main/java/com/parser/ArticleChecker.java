@@ -44,9 +44,6 @@ public class ArticleChecker {
         }
     }
 
-
-
-
     public static void checkLatestArticlesFromOndrl(TelegramBotConfig botConfig, Page page) {
         List<Locator> titles = page.locator("//h3[@class='entry-title td-module-title']/a").all();
         List<Locator> dates = page.locator("//span[@class='td-post-date']/time").all();
@@ -117,6 +114,47 @@ public class ArticleChecker {
             botConfig.sendToAll("❌ No content from date: " + targetDate.format(siteFormatter));
         }
     }
+
+    public static void checkLatestArticlesFromMidr(TelegramBotConfig botConfig, Page page) {
+        List<Locator> articles = page.locator("div.description-latest a h2, div.description-latest a h3").all();
+        List<Locator> links = page.locator("div.description-latest a:nth-child(1)").all();
+        List<Locator> dates = page.locator("span.text-uppercase.date").all();
+
+        DateTimeFormatter siteFormatter = DateTimeFormatter.ofPattern("MMMM d, yyyy", new Locale("ro"));
+
+        // Target date deja formatată corect
+        LocalDate targetDate = LocalDate.parse("mai 19, 2025", siteFormatter);
+
+        boolean found = false;
+
+        for (int i = 0; i < Math.min(links.size(), dates.size()); i++) {
+            String linkHref = links.get(i).getAttribute("href");
+            String titleText = articles.get(i).innerText().trim();
+
+            String dateTextRaw = dates.get(i).innerText().trim();
+
+            try {
+                LocalDate articleDate = LocalDate.parse(dateTextRaw, siteFormatter);
+
+                if (articleDate.equals(targetDate)) {
+                    found = true;
+                    botConfig.sendToAll("✅ Found article:  \n" + titleText + " (" + dateTextRaw + ") " + linkHref);
+                }
+            } catch (DateTimeParseException e) {
+                System.out.println("❌ Nu s-a putut parsa data: " + dateTextRaw);
+            }
+        }
+
+        if (!found) {
+            botConfig.sendToAll("❌ No content from date: " + targetDate.format(siteFormatter));
+        }
+    }
+
+    private static String capitalizeFirstLetter(String input) {
+        if (input == null || input.isEmpty()) return input;
+        return input.substring(0, 1).toUpperCase() + input.substring(1);
+    }
+
 
 
 }
