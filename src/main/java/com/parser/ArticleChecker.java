@@ -8,49 +8,12 @@ import java.util.List;
 import java.util.Locale;
 
 public class ArticleChecker {
-    public static void checkLatestArticles(TelegramBotConfig botConfig, Page page) {
-
-        List<Locator> titles = page.locator("//*[@id='alxposts-2']/ul/li/div/p[1]/a").all();
-        List<Locator> dates = page.locator("//*[@id='alxposts-2']/ul/li/div/p[2]").all();
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-
-//        LocalDate targetDate = LocalDate.parse("08/05/2025", formatter);
-
-         LocalDate targetDate = LocalDate.now();
-
-        String formattedTargetDate = targetDate.format(formatter);
-        boolean found = false;
-
-        for (int i = 0; i < Math.min(titles.size(), dates.size()); i++) {
-            String titleText = titles.get(i).innerText().trim();
-            String dateText = dates.get(i).innerText().trim();
-            String linkHref = titles.get(i).getAttribute("href");
-
-            try {
-                LocalDate articleDate = LocalDate.parse(dateText, formatter);
-
-                if (articleDate.equals(targetDate)) {
-                    found = true;
-                    botConfig.sendToAll("✅ Found article: " + titleText + " (" + dateText + ")" + linkHref);
-                }
-            } catch (DateTimeParseException e) {
-                System.out.println("❌ Nu s-a putut parsa data: " + dateText);
-            }
-        }
-
-        if (!found) {
-            botConfig.sendToAll("❌ No content from date (" + formattedTargetDate + ")");
-        }
-    }
 
     public static void checkLatestArticlesFromOndrl(TelegramBotConfig botConfig, Page page) {
         List<Locator> titles = page.locator("//h3[@class='entry-title td-module-title']/a").all();
         List<Locator> dates = page.locator("//span[@class='td-post-date']/time").all();
 
         DateTimeFormatter siteFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy", new Locale("ro"));
-
-//        LocalDate targetDate = LocalDate.parse("8 mai 2025", siteFormatter);
 
          LocalDate targetDate = LocalDate.now();
 
@@ -66,7 +29,7 @@ public class ArticleChecker {
 
                 if (articleDate.equals(targetDate)) {
                     found = true;
-                    botConfig.sendToAll("✅ Found article: " + titleText + " (" + dateText + ")" + linkHref);
+                    botConfig.sendToAll("✅ Found article:  \n" + titleText + " (" + dateText + ") " + linkHref);
                 }
             } catch (DateTimeParseException e) {
                 System.out.println("❌ Nu s-a putut parsa data: " + dateText);
@@ -84,7 +47,6 @@ public class ArticleChecker {
 
         DateTimeFormatter siteFormatter = DateTimeFormatter.ofPattern("MMMM d yyyy", new Locale("ro"));
 
-//         LocalDate targetDate = LocalDate.parse("aprilie 14 2025", siteFormatter);
         LocalDate targetDate = LocalDate.now();
 
         boolean found = false;
@@ -95,7 +57,6 @@ public class ArticleChecker {
 
             String dateTextRaw = dates.get(i).innerText().trim();
 
-            // ✅ Curățăm data: minuscul și fără virgulă
             String dateText = dateTextRaw.toLowerCase().replace(",", "");
 
             try {
@@ -103,7 +64,9 @@ public class ArticleChecker {
 
                 if (articleDate.equals(targetDate)) {
                     found = true;
-                    botConfig.sendToAll("✅ Found article: " + titleText + " (" + dateTextRaw + ") " + linkHref);
+                    botConfig.sendToAll("✅ Found article:  \n" + titleText + " (" + dateTextRaw + ") " + linkHref);
+
+
                 }
             } catch (DateTimeParseException e) {
                 System.out.println("❌ Nu s-a putut parsa data: " + dateTextRaw);
@@ -120,41 +83,66 @@ public class ArticleChecker {
         List<Locator> links = page.locator("div.description-latest a:nth-child(1)").all();
         List<Locator> dates = page.locator("span.text-uppercase.date").all();
 
-        DateTimeFormatter siteFormatter = DateTimeFormatter.ofPattern("MMMM d, yyyy", new Locale("ro"));
 
-        // Target date deja formatată corect
-        LocalDate targetDate = LocalDate.parse("mai 19, 2025", siteFormatter);
+        LocalDate targetDate = LocalDate.now();
+
+        System.out.println("Data de azi: " + targetDate);
 
         boolean found = false;
 
         for (int i = 0; i < Math.min(links.size(), dates.size()); i++) {
             String linkHref = links.get(i).getAttribute("href");
             String titleText = articles.get(i).innerText().trim();
-
             String dateTextRaw = dates.get(i).innerText().trim();
 
             try {
-                LocalDate articleDate = LocalDate.parse(dateTextRaw, siteFormatter);
+                LocalDate articleDate = parseRomanianDate(dateTextRaw);
 
                 if (articleDate.equals(targetDate)) {
                     found = true;
                     botConfig.sendToAll("✅ Found article:  \n" + titleText + " (" + dateTextRaw + ") " + linkHref);
                 }
-            } catch (DateTimeParseException e) {
+            } catch (Exception e) {
                 System.out.println("❌ Nu s-a putut parsa data: " + dateTextRaw);
             }
         }
 
         if (!found) {
-            botConfig.sendToAll("❌ No content from date: " + targetDate.format(siteFormatter));
+            botConfig.sendToAll("❌ No content from date: " + targetDate);
         }
     }
 
-    private static String capitalizeFirstLetter(String input) {
-        if (input == null || input.isEmpty()) return input;
-        return input.substring(0, 1).toUpperCase() + input.substring(1);
+    private static LocalDate parseRomanianDate(String rawDate) {
+        rawDate = rawDate.toUpperCase(Locale.ROOT).replace(",", "");
+        String[] parts = rawDate.split(" ");
+
+        if (parts.length != 3) {
+            throw new IllegalArgumentException("Format invalid: " + rawDate);
+        }
+
+        int luna = mapLunaToNumar(parts[0]);
+        int zi = Integer.parseInt(parts[1]);
+        int an = Integer.parseInt(parts[2]);
+
+        return LocalDate.of(an, luna, zi);
     }
 
-
+    private static int mapLunaToNumar(String luna) {
+        switch (luna) {
+            case "IANUARIE": return 1;
+            case "FEBRUARIE": return 2;
+            case "MARTIE": return 3;
+            case "APRILIE": return 4;
+            case "MAI": return 5;
+            case "IUNIE": return 6;
+            case "IULIE": return 7;
+            case "AUGUST": return 8;
+            case "SEPTEMBRIE": return 9;
+            case "OCTOMBRIE": return 10;
+            case "NOIEMBRIE": return 11;
+            case "DECEMBRIE": return 12;
+            default: throw new IllegalArgumentException("Lună necunoscută: " + luna);
+        }
+    }
 
 }

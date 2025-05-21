@@ -26,7 +26,7 @@ public class Main {
         try {
             scrapeAndNotifiFromOndrl(botConfig);
             scrapeAndNotifiFromEgrant(botConfig);
-//            scrapeAndNotifiFromMidr(botConfig);
+            scrapeAndNotifiFromMidr(botConfig);
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Unexpected error during scraping", e);
             botConfig.sendToAll("❌ An unexpected error occurred: " + e.getMessage());
