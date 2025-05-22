@@ -29,7 +29,7 @@ public class ArticleChecker {
 
                 if (articleDate.equals(targetDate)) {
                     found = true;
-                    botConfig.sendToAll("✅ Found article:  \n" + titleText + " (" + dateText + ") " + linkHref);
+                    botConfig.sendToAll("✅ Found article:  \n" + titleText + " (" + dateText + ") \n" + linkHref);
                 }
             } catch (DateTimeParseException e) {
                 System.out.println("❌ Nu s-a putut parsa data: " + dateText);
@@ -37,7 +37,7 @@ public class ArticleChecker {
         }
 
         if (!found) {
-            botConfig.sendToAll("❌ No content from date: " + targetDate.format(siteFormatter));
+            System.out.println("❌ No content from date: " + targetDate.format(siteFormatter));
         }
     }
 
@@ -64,7 +64,7 @@ public class ArticleChecker {
 
                 if (articleDate.equals(targetDate)) {
                     found = true;
-                    botConfig.sendToAll("✅ Found article:  \n" + titleText + " (" + dateTextRaw + ") " + linkHref);
+                    botConfig.sendToAll("✅ Found article:  \n" + titleText + " (" + dateTextRaw + ") \n" + linkHref);
 
 
                 }
@@ -74,7 +74,7 @@ public class ArticleChecker {
         }
 
         if (!found) {
-            botConfig.sendToAll("❌ No content from date: " + targetDate.format(siteFormatter));
+            System.out.println("❌ No content from date: " + targetDate.format(siteFormatter));
         }
     }
 
@@ -82,7 +82,6 @@ public class ArticleChecker {
         List<Locator> articles = page.locator("div.description-latest a h2, div.description-latest a h3").all();
         List<Locator> links = page.locator("div.description-latest a:nth-child(1)").all();
         List<Locator> dates = page.locator("span.text-uppercase.date").all();
-
 
         LocalDate targetDate = LocalDate.now();
 
@@ -100,7 +99,7 @@ public class ArticleChecker {
 
                 if (articleDate.equals(targetDate)) {
                     found = true;
-                    botConfig.sendToAll("✅ Found article:  \n" + titleText + " (" + dateTextRaw + ") " + linkHref);
+                    botConfig.sendToAll("✅ Found article:  \n" + titleText + " (" + dateTextRaw + ") \n" + linkHref);
                 }
             } catch (Exception e) {
                 System.out.println("❌ Nu s-a putut parsa data: " + dateTextRaw);
@@ -108,7 +107,7 @@ public class ArticleChecker {
         }
 
         if (!found) {
-            botConfig.sendToAll("❌ No content from date: " + targetDate);
+            System.out.println("❌ No content from date: " + targetDate);
         }
     }
 
