@@ -10,29 +10,21 @@ public class DBHelper {
 
 
     public static Connection getConnection() throws SQLException {
-        String url = System.getenv("DB_URL");
-        String user = System.getenv("DB_USER");
-        String password = System.getenv("DB_PASSWORD");
+        Dotenv dotenv = Dotenv.load();
+        String url = dotenv.get("DB_URL");
 
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException("❌ Driver MySQL not found", e);
-        }
-
-        return DriverManager.getConnection(url, user, password);
+        return DriverManager.getConnection(url);
     }
 
     public static void insertArticle(Connection conn, String title, String url) {
         String insertSQL = "INSERT INTO articles (title, url, inserted_at) VALUES (?, ?, ?)";
 
         LocalDateTime now = LocalDateTime.now();
-        String formattedDate = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
         try (PreparedStatement pstmt = conn.prepareStatement(insertSQL)) {
-            pstmt.setString(1, title);  // Setează titlul
-            pstmt.setString(2, url);    // Setează URL-ul
-            pstmt.setString(3, formattedDate);  // Setează data curentă
+            pstmt.setString(1, title);
+            pstmt.setString(2, url);
+            pstmt.setTimestamp(3, Timestamp.valueOf(now));
 
             int rowsAffected = pstmt.executeUpdate();
             if (rowsAffected > 0) {

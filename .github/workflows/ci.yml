@@ -1,4 +1,5 @@
 name: Playwright Tests
+
 on:
   schedule:
     - cron: '0 */3 * * *'
@@ -24,8 +25,6 @@ jobs:
       - name: Set Environment Variables
         run: |
           echo "DB_URL=${{ secrets.DB_URL }}" >> $GITHUB_ENV
-          echo "DB_USER=${{ secrets.DB_USER }}" >> $GITHUB_ENV
-          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> $GITHUB_ENV
 
       - name: Build & Install Dependencies
         run: mvn -B install -D skipTests --no-transfer-progress
@@ -33,11 +32,13 @@ jobs:
       - name: Compile Application
         run: mvn clean compile
 
-      - name: Check MySQL Connector/J
-        run: mvn dependency:tree | grep mysql-connector-j
+      - name: Check PostgreSQL JDBC Driver
+        run: mvn dependency:tree | grep postgresql
 
       - name: Build Package
         run: mvn clean package
 
       - name: Run Application
+        env:
+          DATABASE_URL: ${{ secrets.DB_URL }}
         run: mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="install-deps"
