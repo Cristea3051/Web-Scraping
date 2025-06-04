@@ -8,10 +8,17 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 public class DBHelper {
 
+
     public static Connection getConnection() throws SQLException {
-        String url = System.getenv("DB_URL");    // GitHub Actions va folosi variabilele setate
+        String url = System.getenv("DB_URL");
         String user = System.getenv("DB_USER");
         String password = System.getenv("DB_PASSWORD");
+
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("❌ Driver MySQL not found", e);
+        }
 
         return DriverManager.getConnection(url, user, password);
     }
