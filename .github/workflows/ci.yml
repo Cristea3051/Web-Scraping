@@ -16,9 +16,14 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '21'
+      - name: Set Environment Variables
+        run: |
+          echo "DB_URL=${{ secrets.DB_URL }}" >> $GITHUB_ENV
+          echo "DB_USER=${{ secrets.DB_USER }}" >> $GITHUB_ENV
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> $GITHUB_ENV
       - name: Build & Install
         run: mvn -B install -D skipTests --no-transfer-progress
       - name: Compile Application
         run: mvn clean compile
-      - name: Compile Application
+      - name: Run Application
         run: mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="install-deps"

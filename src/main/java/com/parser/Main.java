@@ -1,6 +1,10 @@
 package com.parser;
 
 import com.microsoft.playwright.*;
+import com.parser.scrapers.EgrantScraper;
+import com.parser.scrapers.MidrScraper;
+import com.parser.scrapers.OndrlScraper;
+
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -10,11 +14,11 @@ import java.util.logging.Logger;
 
 public class Main {
     private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
-    private static final String TARGET_URL_ONDRL = "https://ondrl.gov.md/comunicare-publica/ ";
-    private static final String URL_EGRANT = "https://egrant.md/category/granturi/";
-    private static final String URL_MIDR = "https://midr.gov.md/ro/noutati";
-
-
+    private static final List<String> TARGET_URLS = List.of(
+            "https://ondrl.gov.md/comunicare-publica/",
+            "https://egrant.md/category/granturi/",
+            "https://midr.gov.md/ro/noutati"
+    );
 
     public static void main(String[] args) {
         TelegramBotConfig botConfig = new TelegramBotConfig();
@@ -24,9 +28,7 @@ public class Main {
         }
 
         try {
-            scrapeAndNotifiFromOndrl(botConfig);
-            scrapeAndNotifiFromEgrant(botConfig);
-            scrapeAndNotifiFromMidr(botConfig);
+            scrapeAndNotifyAll(botConfig);
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Unexpected error during scraping", e);
             botConfig.sendToAll("❌ An unexpected error occurred: " + e.getMessage());
@@ -36,41 +38,23 @@ public class Main {
         }
     }
 
-    public static void scrapeAndNotifiFromOndrl(TelegramBotConfig botConfig){
-
+    public static void scrapeAndNotifyAll(TelegramBotConfig botConfig) {
         try (Playwright playwright = Playwright.create()) {
             BrowserContext context = setupBrowserContext(playwright);
             try (context) {
                 Page page = context.pages().getFirst();
-                page.navigate(TARGET_URL_ONDRL);
-                page.waitForTimeout(3000);
-                ArticleChecker.checkLatestArticlesFromOndrl(botConfig, page);
-            }
-        }
-    }
 
-    public static void scrapeAndNotifiFromMidr(TelegramBotConfig botConfig){
+                List<ArticleScraper> scrapers = List.of(
+                        new OndrlScraper(),
+                        new EgrantScraper(),
+                        new MidrScraper()
+                );
 
-        try (Playwright playwright = Playwright.create()) {
-            BrowserContext context = setupBrowserContext(playwright);
-            try (context) {
-                Page page = context.pages().getFirst();
-                page.navigate(URL_MIDR);
-                page.waitForTimeout(3000);
-                ArticleChecker.checkLatestArticlesFromMidr(botConfig, page);
-            }
-        }
-    }
-
-    public static void scrapeAndNotifiFromEgrant(TelegramBotConfig botConfig){
-
-        try (Playwright playwright = Playwright.create()) {
-            BrowserContext context = setupBrowserContext(playwright);
-            try (context) {
-                Page page = context.pages().getFirst();
-                page.navigate(URL_EGRANT);
-                page.waitForTimeout(3000);
-                ArticleChecker.chechLatestArticlesFromEgrant(botConfig, page);
+                for (ArticleScraper scraper : scrapers) {
+                    page.navigate(scraper.getUrl());
+                    page.waitForTimeout(3000);
+                    scraper.checkLatestArticles(botConfig, page);
+                }
             }
         }
     }

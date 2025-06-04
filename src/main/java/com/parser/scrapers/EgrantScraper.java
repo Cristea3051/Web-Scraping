@@ -1,5 +1,6 @@
 package com.parser.scrapers;
 
+import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.*;
 import com.parser.ArticleScraper;
 import com.parser.TelegramBotConfig;
@@ -15,6 +16,13 @@ import java.util.Locale;
 
 public class EgrantScraper implements ArticleScraper {
 
+    private static final String URL = "https://egrant.md/category/granturi/";
+
+    @Override
+    public String getUrl() {
+        return URL;
+    }
+
     @Override
     public void checkLatestArticles(TelegramBotConfig botConfig, Page page) {
         List<Locator> titles = page.locator("h2.entry-title a").all();
@@ -28,6 +36,7 @@ public class EgrantScraper implements ArticleScraper {
         for (int i = 0; i < Math.min(titles.size(), dates.size()); i++) {
             String titleText = titles.get(i).innerText().trim();
             String linkHref = titles.get(i).getAttribute("href");
+
             String dateTextRaw = dates.get(i).innerText().trim();
             String dateText = dateTextRaw.toLowerCase().replace(",", "");
 
@@ -38,7 +47,7 @@ public class EgrantScraper implements ArticleScraper {
                     try (Connection conn = DBHelper.getConnection()) {
                         if (!DBHelper.articleExists(conn, titleText, linkHref)) {
                             DBHelper.insertArticle(conn, titleText, linkHref);
-                            botConfig.sendToAll("✅ Found article:\n" + titleText + " (" + dateText + ")\n" + linkHref);
+                            botConfig.sendToAll("✅ Found article:\n" + titleText + " (" + dateTextRaw + ")\n" + linkHref);
                             found = true;
                         } else {
                             System.out.println("⚠️ Articolul există deja în DB.");
@@ -48,7 +57,7 @@ public class EgrantScraper implements ArticleScraper {
                     }
                 }
             } catch (DateTimeParseException e) {
-                System.out.println("❌ Nu s-a putut parsa data: " + dateText);
+                System.out.println("❌ Nu s-a putut parsa data: " + dateTextRaw);
             }
         }
 

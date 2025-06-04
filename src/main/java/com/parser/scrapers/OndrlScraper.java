@@ -1,8 +1,9 @@
 package com.parser.scrapers;
 
-import com.microsoft.playwright.*;
+import com.microsoft.playwright.Page;
 import com.parser.ArticleScraper;
 import com.parser.TelegramBotConfig;
+import com.microsoft.playwright.*;
 import com.parser.db.DBHelper;
 
 import java.sql.Connection;
@@ -14,6 +15,12 @@ import java.util.List;
 import java.util.Locale;
 
 public class OndrlScraper implements ArticleScraper {
+    private static final String URL = "https://ondrl.gov.md/comunicare-publica/";
+
+    @Override
+    public String getUrl() {
+        return URL;
+    }
 
     @Override
     public void checkLatestArticles(TelegramBotConfig botConfig, Page page) {

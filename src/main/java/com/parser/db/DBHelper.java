@@ -8,21 +8,17 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 public class DBHelper {
 
-    // Metodă pentru obținerea unei conexiuni la baza de date
     public static Connection getConnection() throws SQLException {
-        Dotenv dotenv = Dotenv.load();
-        String url = dotenv.get("DB_URL");
-        String user = dotenv.get("DB_USER");
-        String password = dotenv.get("DB_PASSWORD");
+        String url = System.getenv("DB_URL");    // GitHub Actions va folosi variabilele setate
+        String user = System.getenv("DB_USER");
+        String password = System.getenv("DB_PASSWORD");
 
         return DriverManager.getConnection(url, user, password);
     }
 
-    // Metodă pentru inserarea unui articol în baza de date
     public static void insertArticle(Connection conn, String title, String url) {
         String insertSQL = "INSERT INTO articles (title, url, inserted_at) VALUES (?, ?, ?)";
 
-        // Setăm parametrul 'inserted_at' la data și ora curentă
         LocalDateTime now = LocalDateTime.now();
         String formattedDate = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
@@ -42,7 +38,6 @@ public class DBHelper {
         }
     }
 
-    // Metodă pentru a închide conexiunea la baza de date (dacă este necesar)
     public static void closeConnection(Connection conn) {
         if (conn != null) {
             try {
@@ -54,9 +49,7 @@ public class DBHelper {
         }
     }
 
-    // Exemplu de metodă pentru a insera un articol
     public static void main(String[] args) {
-        // Exemplu de folosire a metodei insertArticle
         try (Connection conn = getConnection()) {
             insertArticle(conn, "Articol de Test", "https://exemplu.com/articol");
         } catch (SQLException e) {
@@ -65,7 +58,7 @@ public class DBHelper {
     }
 
     public static boolean articleExists(Connection conn, String title, String link) throws SQLException {
-        String sql = "SELECT COUNT(*) FROM articles WHERE title = ? AND link = ?";
+        String sql = "SELECT COUNT(*) FROM articles WHERE title = ? AND url = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, title);
             stmt.setString(2, link);
