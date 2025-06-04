@@ -1,6 +1,9 @@
 package com.parser;
 
 import com.microsoft.playwright.*;
+import com.parser.db.DBHelper;
+
+import java.sql.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -8,38 +11,6 @@ import java.util.List;
 import java.util.Locale;
 
 public class ArticleChecker {
-
-    public static void checkLatestArticlesFromOndrl(TelegramBotConfig botConfig, Page page) {
-        List<Locator> titles = page.locator("//h3[@class='entry-title td-module-title']/a").all();
-        List<Locator> dates = page.locator("//span[@class='td-post-date']/time").all();
-
-        DateTimeFormatter siteFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy", new Locale("ro"));
-
-         LocalDate targetDate = LocalDate.now();
-
-        boolean found = false;
-
-        for (int i = 0; i < Math.min(titles.size(), dates.size()); i++) {
-            String titleText = titles.get(i).innerText().trim();
-            String dateText = dates.get(i).innerText().trim();
-            String linkHref = titles.get(i).getAttribute("href");
-
-            try {
-                LocalDate articleDate = LocalDate.parse(dateText, siteFormatter);
-
-                if (articleDate.equals(targetDate)) {
-                    found = true;
-                    botConfig.sendToAll("✅ Found article:  \n" + titleText + " (" + dateText + ") \n" + linkHref);
-                }
-            } catch (DateTimeParseException e) {
-                System.out.println("❌ Nu s-a putut parsa data: " + dateText);
-            }
-        }
-
-        if (!found) {
-            System.out.println("❌ No content from date: " + targetDate.format(siteFormatter));
-        }
-    }
 
     public static void chechLatestArticlesFromEgrant(TelegramBotConfig botConfig, Page page){
         List<Locator> titles = page.locator("h2.entry-title a").all();
