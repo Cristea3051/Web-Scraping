@@ -1,3 +1,4 @@
 my-user-data-dir/
 target/
 .idea/
+.env
