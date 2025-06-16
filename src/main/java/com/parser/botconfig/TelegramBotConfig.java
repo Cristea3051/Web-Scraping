@@ -1,4 +1,4 @@
-package com.parser;
+package com.parser.botconfig;
 
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;

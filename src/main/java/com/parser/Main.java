@@ -1,9 +1,11 @@
 package com.parser;
 
 import com.microsoft.playwright.*;
+import com.parser.botconfig.TelegramBotConfig;
 import com.parser.scrapers.EgrantScraper;
 import com.parser.scrapers.MidrScraper;
 import com.parser.scrapers.OndrlScraper;
+import com.parser.scrapers.OnipmScraper;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -14,11 +16,6 @@ import java.util.logging.Logger;
 
 public class Main {
     private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
-    private static final List<String> TARGET_URLS = List.of(
-            "https://ondrl.gov.md/comunicare-publica/",
-            "https://egrant.md/category/granturi/",
-            "https://midr.gov.md/ro/noutati"
-    );
 
     public static void main(String[] args) {
         TelegramBotConfig botConfig = new TelegramBotConfig();
@@ -47,7 +44,8 @@ public class Main {
                 List<ArticleScraper> scrapers = List.of(
                         new OndrlScraper(),
                         new EgrantScraper(),
-                        new MidrScraper()
+                        new MidrScraper(),
+                        new OnipmScraper()
                 );
 
                 for (ArticleScraper scraper : scrapers) {

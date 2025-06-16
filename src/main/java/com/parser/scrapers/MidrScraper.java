@@ -2,7 +2,7 @@ package com.parser.scrapers;
 
 import com.microsoft.playwright.Page;
 import com.parser.ArticleScraper;
-import com.parser.TelegramBotConfig;
+import com.parser.botconfig.TelegramBotConfig;
 import com.parser.db.DBHelper;
 import com.microsoft.playwright.*;
 import java.sql.Connection;

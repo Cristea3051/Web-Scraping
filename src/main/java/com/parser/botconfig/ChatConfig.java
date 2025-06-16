@@ -1,4 +1,4 @@
-package com.parser;
+package com.parser.botconfig;
 
 import java.util.ArrayList;
 import java.util.List;

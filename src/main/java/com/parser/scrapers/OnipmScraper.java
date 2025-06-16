@@ -14,8 +14,8 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Locale;
 
-public class OndrlScraper implements ArticleScraper {
-    private static final String URL = "https://ondrl.gov.md/comunicare-publica/";
+public class OnipmScraper implements ArticleScraper {
+    private static final String URL = "https://onipm.gov.md/news?field_press_release_type_tid=All";
 
     @Override
     public String getUrl() {
@@ -24,9 +24,10 @@ public class OndrlScraper implements ArticleScraper {
 
     @Override
     public void checkLatestArticles(TelegramBotConfig botConfig, Page page) {
-        List<Locator> titles = page.locator("//h3[@class='entry-title td-module-title']/a").all();
-        List<Locator> dates = page.locator("//span[@class='td-post-date']/time").all();
+        List<Locator> titles = page.locator("h4.views-field-title span a").all();
+        List<Locator> dates = page.locator("//div[contains(@class, 'views-row')]//span[not(a)]").all();
 
+        // Formatter potrivit pentru formatul "4/6/2025"
         DateTimeFormatter siteFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy", new Locale("ro"));
         LocalDate targetDate = LocalDate.now();
 
@@ -62,4 +63,5 @@ public class OndrlScraper implements ArticleScraper {
             System.out.println("❌ No content from date: " + targetDate.format(siteFormatter));
         }
     }
+
 }
