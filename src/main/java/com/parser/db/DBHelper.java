@@ -36,24 +36,30 @@ public class DBHelper {
         }
     }
 
-    public static void closeConnection(Connection conn) {
-        if (conn != null) {
-            try {
-                conn.close();
-                System.out.println("Conexiunea la baza de date a fost închisă.");
-            } catch (SQLException e) {
-                System.out.println("❌ Eroare la închiderea conexiunii: " + e.getMessage());
-            }
-        }
-    }
-
     public static void main(String[] args) {
         try (Connection conn = getConnection()) {
             insertArticle(conn, "Articol de Test", "https://exemplu.com/articol");
+            deleteOldArticles(conn);
         } catch (SQLException e) {
             System.out.println("❌ Eroare la obținerea conexiunii: " + e.getMessage());
         }
     }
+
+    public static void deleteOldArticles(Connection conn) {
+        String deleteSQL = "DELETE FROM articles WHERE inserted_at <= ?";
+
+        LocalDateTime thresholdDate = LocalDateTime.now().minusDays(30);
+
+        try (PreparedStatement pstmt = conn.prepareStatement(deleteSQL)) {
+            pstmt.setTimestamp(1, Timestamp.valueOf(thresholdDate));
+
+            int rowsDeleted = pstmt.executeUpdate();
+            System.out.println("🗑️ Au fost șterse " + rowsDeleted + " articole mai vechi de 30 de zile.");
+        } catch (SQLException e) {
+            System.out.println("❌ Eroare la ștergerea articolelor vechi: " + e.getMessage());
+        }
+    }
+
 
     public static boolean articleExists(Connection conn, String title, String link) throws SQLException {
         String sql = "SELECT COUNT(*) FROM articles WHERE title = ? AND url = ?";

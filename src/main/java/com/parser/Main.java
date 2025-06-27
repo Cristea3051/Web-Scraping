@@ -2,6 +2,7 @@ package com.parser;
 
 import com.microsoft.playwright.*;
 import com.parser.botconfig.TelegramBotConfig;
+import com.parser.db.DBHelper;
 import com.parser.scrapers.EgrantScraper;
 import com.parser.scrapers.MidrScraper;
 import com.parser.scrapers.OndrlScraper;
@@ -9,6 +10,8 @@ import com.parser.scrapers.OnipmScraper;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -36,6 +39,11 @@ public class Main {
     }
 
     public static void scrapeAndNotifyAll(TelegramBotConfig botConfig) {
+        try (Connection conn = DBHelper.getConnection()) {
+            DBHelper.deleteOldArticles(conn);
+        } catch (SQLException e) {
+            System.out.println("❌ Eroare la ștergerea articolelor vechi: " + e.getMessage());
+        }
         try (Playwright playwright = Playwright.create()) {
             BrowserContext context = setupBrowserContext(playwright);
             try (context) {
