@@ -12,7 +12,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
-import java.util.Locale;
 
 public class OnipmScraper implements ArticleScraper {
     private static final String URL = "https://onipm.gov.md/news?field_press_release_type_tid=All";
@@ -43,7 +42,7 @@ public class OnipmScraper implements ArticleScraper {
 
                 if (articleDate.equals(targetDate)) {
                     try (Connection conn = DBHelper.getConnection()) {
-                        if (!DBHelper.articleExists(conn, titleText, linkHref)) {
+                        if (DBHelper.articleExists(conn, titleText, linkHref)) {
                             DBHelper.insertArticle(conn, titleText, linkHref);
                             botConfig.sendToAll("✅ Found article:\n" + titleText + " (" + dateText + ")\n" + URL);
                             found = true;

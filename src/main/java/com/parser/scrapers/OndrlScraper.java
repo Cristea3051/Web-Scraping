@@ -42,7 +42,7 @@ public class OndrlScraper implements ArticleScraper {
 
                 if (articleDate.equals(targetDate)) {
                     try (Connection conn = DBHelper.getConnection()) {
-                        if (!DBHelper.articleExists(conn, titleText, linkHref)) {
+                        if (DBHelper.articleExists(conn, titleText, linkHref)) {
                             DBHelper.insertArticle(conn, titleText, linkHref);
                             botConfig.sendToAll("✅ Found article:\n" + titleText + " (" + dateText + ")\n" + linkHref);
                             found = true;

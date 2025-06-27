@@ -68,7 +68,7 @@ public class DBHelper {
             stmt.setString(2, link);
             try (ResultSet rs = stmt.executeQuery()) {
                 rs.next();
-                return rs.getInt(1) > 0;
+                return rs.getInt(1) <= 0;
             }
         }
     }
