@@ -51,7 +51,7 @@ public class MidrScraper implements ArticleScraper {
                     }
                 }
             } catch (Exception e) {
-                System.out.println("❌ Nu s-a putut parsa data: " + dateTextRaw);
+                System.out.println("❌ Nu s-a putut parsa data: " + dateTextRaw + URL);
             }
         }
 

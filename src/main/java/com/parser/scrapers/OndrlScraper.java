@@ -54,7 +54,7 @@ public class OndrlScraper implements ArticleScraper {
                     }
                 }
             } catch (DateTimeParseException e) {
-                System.out.println("❌ Nu s-a putut parsa data: " + dateText);
+                System.out.println("❌ Nu s-a putut parsa data: " + dateText + URL);
             }
         }
 

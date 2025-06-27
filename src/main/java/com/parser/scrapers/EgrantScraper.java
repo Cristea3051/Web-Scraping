@@ -57,7 +57,7 @@ public class EgrantScraper implements ArticleScraper {
                     }
                 }
             } catch (DateTimeParseException e) {
-                System.out.println("❌ Nu s-a putut parsa data: " + dateTextRaw);
+                System.out.println("❌ Nu s-a putut parsa data: " + dateTextRaw + URL);
             }
         }
 

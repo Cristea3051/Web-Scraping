@@ -3,7 +3,6 @@ package com.parser.db;
 
 import java.sql.*;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import io.github.cdimascio.dotenv.Dotenv;
 
 public class DBHelper {

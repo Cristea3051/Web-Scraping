@@ -28,7 +28,7 @@ public class OnipmScraper implements ArticleScraper {
         List<Locator> dates = page.locator("//div[contains(@class, 'views-row')]//span[not(a)]").all();
 
         // Formatter potrivit pentru formatul "4/6/2025"
-        DateTimeFormatter siteFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy", new Locale("ro"));
+        DateTimeFormatter siteFormatter = DateTimeFormatter.ofPattern("d/M/yyyy");
         LocalDate targetDate = LocalDate.now();
 
         boolean found = false;
@@ -45,7 +45,7 @@ public class OnipmScraper implements ArticleScraper {
                     try (Connection conn = DBHelper.getConnection()) {
                         if (!DBHelper.articleExists(conn, titleText, linkHref)) {
                             DBHelper.insertArticle(conn, titleText, linkHref);
-                            botConfig.sendToAll("✅ Found article:\n" + titleText + " (" + dateText + ")\n" + linkHref);
+                            botConfig.sendToAll("✅ Found article:\n" + titleText + " (" + dateText + ")\n" + URL);
                             found = true;
                         } else {
                             System.out.println("⚠️ Articolul există deja în DB.");
@@ -55,7 +55,7 @@ public class OnipmScraper implements ArticleScraper {
                     }
                 }
             } catch (DateTimeParseException e) {
-                System.out.println("❌ Nu s-a putut parsa data: " + dateText);
+                System.out.printf("❌ Nu s-a putut parsa data: %s (%s)%n", dateText, URL);
             }
         }
 
