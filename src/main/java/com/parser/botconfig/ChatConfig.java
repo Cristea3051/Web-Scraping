@@ -23,5 +23,6 @@ public class ChatConfig {
         CHAT_IDS = new ArrayList<>();
         CHAT_IDS.add(1019028913L);
         CHAT_IDS.add(5565832402L);
+CHAT_IDS.add(7587021367L);
     }
 }
