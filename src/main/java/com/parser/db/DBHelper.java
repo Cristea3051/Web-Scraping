@@ -9,8 +9,21 @@ public class DBHelper {
 
 
     public static Connection getConnection() throws SQLException {
-        Dotenv dotenv = Dotenv.load();
-        String url = dotenv.get("DB_URL");
+        // Prima dată verifică variabilele de mediu ale sistemului (folosit în GitHub Actions)
+        String url = System.getenv("DB_URL");
+
+        // Dacă nu există în environment variables, încearcă să încarci din .env (pentru dezvoltare locală)
+        if (url == null || url.isEmpty()) {
+            Dotenv dotenv = Dotenv.configure()
+                    .ignoreIfMissing()  // Nu aruncă excepție dacă .env lipsește
+                    .load();
+            url = dotenv.get("DB_URL");
+        }
+
+        // Verifică dacă DB_URL a fost găsit
+        if (url == null || url.isEmpty()) {
+            throw new SQLException("DB_URL nu este configurată! Adaugă-o în variabilele de mediu sau în fișierul .env");
+        }
 
         return DriverManager.getConnection(url);
     }

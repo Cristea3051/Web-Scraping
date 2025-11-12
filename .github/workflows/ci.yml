@@ -38,5 +38,8 @@ jobs:
       - name: Build Package
         run: mvn clean package
 
-      - name: Run Playwright CLI
+      - name: Install Playwright Dependencies
         run: mvn exec:java -e -Dexec.mainClass=com.microsoft.playwright.CLI -Dexec.args="install-deps"
+
+      - name: Run Application
+        run: mvn exec:java
