@@ -3,7 +3,10 @@ package com.parser;
 import com.microsoft.playwright.*;
 import com.parser.botconfig.TelegramBotConfig;
 import com.parser.db.DBHelper;
+import com.parser.scrapers.AIPAScraper;
+import com.parser.scrapers.CivicScraper;
 import com.parser.scrapers.EgrantScraper;
+import com.parser.scrapers.McGovScraper;
 import com.parser.scrapers.MidrScraper;
 import com.parser.scrapers.OndrlScraper;
 import com.parser.scrapers.OnipmScraper;
@@ -53,7 +56,10 @@ public class Main {
                         new OndrlScraper(),
                         new EgrantScraper(),
                         new MidrScraper(),
-                        new OnipmScraper()
+                        new OnipmScraper(),
+                        new CivicScraper(),
+                        new McGovScraper(),
+                        new AIPAScraper()
                 );
 
                 for (ArticleScraper scraper : scrapers) {
