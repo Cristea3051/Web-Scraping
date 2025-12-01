@@ -26,7 +26,6 @@ public class OnipmScraper implements ArticleScraper {
         List<Locator> titles = page.locator("h4.views-field-title span a").all();
         List<Locator> dates = page.locator("//div[contains(@class, 'views-row')]//span[not(a)]").all();
 
-        // Formatter potrivit pentru formatul "4/6/2025"
         DateTimeFormatter siteFormatter = DateTimeFormatter.ofPattern("d/M/yyyy");
         LocalDate targetDate = LocalDate.now();
 

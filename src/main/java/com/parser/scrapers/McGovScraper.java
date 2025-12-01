@@ -24,12 +24,9 @@ public class McGovScraper implements ArticleScraper {
 
     @Override
     public void checkLatestArticles(TelegramBotConfig botConfig, Page page) {
-        // Selectăm toate datele
         List<Locator> dates = page.locator("div.views-field.views-field-created span.field-content").all();
-        // Selectăm toate linkurile din titluri
         List<Locator> titles = page.locator("div.views-field.views-field-title span.field-content a").all();
 
-        // Formatul datei de pe site este "dd.MM.yyyy" (ex: 23.10.2025)
         DateTimeFormatter siteFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
         LocalDate targetDate = LocalDate.now();
 
@@ -37,7 +34,6 @@ public class McGovScraper implements ArticleScraper {
 
         for (int i = 0; i < Math.min(titles.size(), dates.size()); i++) {
             String titleText = titles.get(i).innerText().trim();
-            // Link-ul este relativ, deci trebuie să construim URL-ul complet
             String linkHrefRelative = titles.get(i).getAttribute("href");
             String linkHref = "https://mc.gov.md" + linkHrefRelative;
 

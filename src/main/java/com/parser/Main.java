@@ -64,7 +64,7 @@ public class Main {
 
                 for (ArticleScraper scraper : scrapers) {
                     page.navigate(scraper.getUrl());
-                    page.waitForTimeout(3000);
+                    page.waitForTimeout(10000);
                     scraper.checkLatestArticles(botConfig, page);
                 }
             }

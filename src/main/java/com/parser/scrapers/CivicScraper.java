@@ -4,7 +4,6 @@ import com.parser.ArticleScraper;
 
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.*;
-import com.parser.ArticleScraper;
 import com.parser.botconfig.TelegramBotConfig;
 import com.parser.db.DBHelper;
 
@@ -14,7 +13,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
-import java.util.Locale;
 
 public class CivicScraper implements ArticleScraper {
 
@@ -27,12 +25,9 @@ public class CivicScraper implements ArticleScraper {
 
     @Override
     public void checkLatestArticles(TelegramBotConfig botConfig, Page page) {
-        // Selectăm toate linkurile din tabelul de articole
         List<Locator> titles = page.locator("td.list-title a").all();
-        // Selectăm toate datele
         List<Locator> dates = page.locator("td.list-date").all();
 
-        // Formatul datei de pe site este "dd/MM/yyyy" (ex: 07/11/2025)
         DateTimeFormatter siteFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         LocalDate targetDate = LocalDate.now();
 
@@ -40,7 +35,6 @@ public class CivicScraper implements ArticleScraper {
 
         for (int i = 0; i < Math.min(titles.size(), dates.size()); i++) {
             String titleText = titles.get(i).innerText().trim();
-            // Link-ul este relativ, deci trebuie să construim URL-ul complet
             String linkHrefRelative = titles.get(i).getAttribute("href");
             String linkHref = "https://civic.md" + linkHrefRelative;
 

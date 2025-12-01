@@ -25,12 +25,9 @@ public class AIPAScraper implements ArticleScraper {
 
     @Override
     public void checkLatestArticles(TelegramBotConfig botConfig, Page page) {
-        // Selectăm toate linkurile din titluri
         List<Locator> titles = page.locator("div.pcsl-title a").all();
-        // Selectăm toate datele
         List<Locator> dates = page.locator("time.entry-date.published").all();
 
-        // Formatul datei de pe site este "d MMMM yyyy" în română (ex: 4 noiembrie 2025)
         DateTimeFormatter siteFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy", new Locale("ro"));
         LocalDate targetDate = LocalDate.now();
 
@@ -38,7 +35,6 @@ public class AIPAScraper implements ArticleScraper {
 
         for (int i = 0; i < Math.min(titles.size(), dates.size()); i++) {
             String titleText = titles.get(i).innerText().trim();
-            // Link-ul este deja absolut
             String linkHref = titles.get(i).getAttribute("href");
 
             String dateTextRaw = dates.get(i).innerText().trim();
